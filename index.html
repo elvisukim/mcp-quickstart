@@ -608,32 +608,32 @@
   <!-- ── Sidebar ── -->
   <nav class="sidebar">
     <div class="nav-section">
-      <div class="nav-section-title">시작하기</div>
-      <a class="nav-link" href="#"><span class="icon">⚡</span>빠른 시작</a>
-      <a class="nav-link" href="#"><span class="icon">📦</span>설치</a>
+      <div class="nav-section-title">이 페이지</div>
+      <a class="nav-link active" href="#top"><span class="icon">🔌</span>MCP 빠른 시작</a>
+      <a class="nav-link" href="#before"><span class="icon">⚡</span>시작하기 전에</a>
+      <a class="nav-link" href="#add"><span class="icon">📦</span>서버 추가 및 확인</a>
     </div>
     <div class="nav-section">
-      <div class="nav-section-title">MCP 서버</div>
-      <a class="nav-link active" href="#"><span class="icon">🔌</span>MCP 빠른 시작</a>
-      <a class="nav-link" href="#"><span class="icon">📋</span>MCP 레퍼런스</a>
-      <a class="nav-link" href="#"><span class="icon">🔧</span>서버 구성</a>
+      <div class="nav-section-title">설정</div>
+      <a class="nav-link" href="#scopes"><span class="icon">📂</span>서버 저장 위치</a>
+      <a class="nav-link" href="#change-scope"><span class="icon">🔧</span>서버 범위 변경</a>
+      <a class="nav-link" href="#mcp-json"><span class="icon">📋</span>.mcp.json 직접 편집</a>
     </div>
     <div class="nav-section">
-      <div class="nav-section-title">플랫폼</div>
-      <a class="nav-link" href="#"><span class="icon">🖥</span>데스크톱 앱</a>
-      <a class="nav-link" href="#"><span class="icon">💻</span>VS Code</a>
-      <a class="nav-link" href="#"><span class="icon">🌐</span>웹</a>
+      <div class="nav-section-title">예시</div>
+      <a class="nav-link" href="#examples"><span class="icon">🖥</span>로컬 서버 (Playwright)</a>
+      <a class="nav-link" href="#examples"><span class="icon">🔑</span>OAuth 로그인 (Sentry)</a>
+      <a class="nav-link" href="#other-surfaces"><span class="icon">🌐</span>다른 환경 연결</a>
     </div>
     <div class="nav-section">
-      <div class="nav-section-title">레퍼런스</div>
-      <a class="nav-link" href="#"><span class="icon">⚙️</span>환경 변수</a>
-      <a class="nav-link" href="#"><span class="icon">🔑</span>인증</a>
-      <a class="nav-link" href="#"><span class="icon">🏢</span>관리형 MCP</a>
+      <div class="nav-section-title">도움말</div>
+      <a class="nav-link" href="#troubleshooting"><span class="icon">⚙️</span>문제 해결</a>
+      <a class="nav-link" href="#next"><span class="icon">🚀</span>다음 단계</a>
     </div>
   </nav>
 
   <!-- ── Main ── -->
-  <main class="main">
+  <main class="main" id="top">
 
     <!-- Breadcrumb -->
     <div class="breadcrumb">
@@ -1122,26 +1122,35 @@
     });
   }
 
-  // Highlight active TOC link on scroll
-  const sections = document.querySelectorAll('h2[id]');
+  // Highlight active TOC + sidebar link on scroll
+  const sections = document.querySelectorAll('[id]');
   const tocLinks = document.querySelectorAll('.toc-link');
+  const navLinks = document.querySelectorAll('.nav-link');
 
-  window.addEventListener('scroll', () => {
-    let current = '';
+  function updateActive() {
+    let current = 'top';
     sections.forEach(s => {
-      if (window.scrollY >= s.offsetTop - 80) current = s.id;
+      if (window.scrollY >= s.offsetTop - 100) current = s.id;
     });
     tocLinks.forEach(l => {
-      l.classList.remove('active');
-      if (l.getAttribute('href') === '#' + current) l.classList.add('active');
+      l.classList.toggle('active', l.getAttribute('href') === '#' + current);
     });
-  });
+    navLinks.forEach(l => {
+      l.classList.toggle('active', l.getAttribute('href') === '#' + current);
+    });
+  }
 
-  // Highlight active sidebar link
-  document.querySelectorAll('.nav-link').forEach(l => {
-    l.addEventListener('click', function() {
-      document.querySelectorAll('.nav-link').forEach(x => x.classList.remove('active'));
-      this.classList.add('active');
+  window.addEventListener('scroll', updateActive);
+  updateActive();
+
+  // Smooth scroll for all anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', function(e) {
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     });
   });
 </script>
