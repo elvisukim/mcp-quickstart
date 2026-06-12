@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MCP Quickstart — Claude Code Docs</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f0f0f;
+      --surface: #1a1a1a;
+      --surface-2: #242424;
+      --border: #2e2e2e;
+      --text: #e8e3dc;
+      --text-muted: #8a8278;
+      --text-dim: #5a5550;
+      --accent: #d4a853;
+      --accent-hover: #e0b96a;
+      --accent-dim: #3d2e10;
+      --green: #4caf7d;
+      --red: #e05c5c;
+      --yellow: #d4a853;
+      --blue: #5c9ee0;
+      --code-bg: #141414;
+      --code-border: #2a2a2a;
+      --sidebar-w: 260px;
+      --header-h: 56px;
+      --radius: 8px;
+      --radius-sm: 5px;
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    }
+
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    /* ── Header ── */
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--header-h);
+      background: rgba(15,15,15,.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 16px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 28px; height: 28px;
+      background: linear-gradient(135deg, #d4a853 0%, #c47c2a 100%);
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .header-divider {
+      width: 1px; height: 20px;
+      background: var(--border);
+    }
+
+    .header-title {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .header-badge {
+      margin-left: auto;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    /* ── Layout ── */
+    .layout {
+      display: flex;
+      padding-top: var(--header-h);
+      min-height: 100vh;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      position: fixed;
+      top: var(--header-h);
+      left: 0;
+      bottom: 0;
+      overflow-y: auto;
+      border-right: 1px solid var(--border);
+      padding: 20px 0;
+      background: var(--bg);
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    .nav-section { margin-bottom: 8px; }
+
+    .nav-section-title {
+      padding: 6px 16px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 16px;
+      font-size: 13.5px;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-left: 2px solid transparent;
+      transition: color .15s, background .15s, border-color .15s;
+      cursor: pointer;
+    }
+
+    .nav-link:hover {
+      color: var(--text);
+      background: var(--surface);
+    }
+
+    .nav-link.active {
+      color: var(--accent);
+      background: var(--accent-dim);
+      border-left-color: var(--accent);
+    }
+
+    .nav-link .icon {
+      font-size: 14px;
+      width: 16px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    /* ── Main ── */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      max-width: 860px;
+      padding: 48px 56px;
+    }
+
+    /* ── Breadcrumb ── */
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--text-dim);
+      margin-bottom: 28px;
+    }
+
+    .breadcrumb a {
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+
+    .breadcrumb a:hover { color: var(--accent); }
+
+    .breadcrumb span { font-size: 11px; }
+
+    /* ── Typography ── */
+    h1 {
+      font-size: 30px;
+      font-weight: 600;
+      line-height: 1.25;
+      margin-bottom: 12px;
+      color: var(--text);
+      letter-spacing: -.02em;
+    }
+
+    .subtitle {
+      font-size: 16px;
+      color: var(--text-muted);
+      margin-bottom: 36px;
+      line-height: 1.5;
+    }
+
+    h2 {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text);
+      margin: 40px 0 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      letter-spacing: -.01em;
+    }
+
+    h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      margin: 28px 0 12px;
+    }
+
+    p { margin-bottom: 16px; color: var(--text); line-height: 1.7; }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+    /* ── Callout ── */
+    .callout {
+      border: 1px solid;
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      margin: 20px 0;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .callout.note {
+      background: rgba(92, 158, 224, .06);
+      border-color: rgba(92, 158, 224, .25);
+      color: #a8c8e8;
+    }
+
+    .callout.info {
+      background: rgba(76, 175, 125, .06);
+      border-color: rgba(76, 175, 125, .25);
+      color: #90c8a8;
+    }
+
+    .callout-icon { flex-shrink: 0; font-size: 15px; margin-top: 1px; }
+
+    /* ── Code ── */
+    code {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      background: var(--surface-2);
+      color: #e0c99a;
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--code-border);
+    }
+
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      overflow-x: auto;
+      margin: 16px 0;
+      position: relative;
+    }
+
+    pre code {
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: 13.5px;
+      color: #d4c5a5;
+      line-height: 1.65;
+    }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface);
+      border: 1px solid var(--code-border);
+      border-bottom: none;
+      border-radius: var(--radius) var(--radius) 0 0;
+      padding: 8px 16px;
+      font-size: 12px;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+    }
+
+    .code-header + pre {
+      border-radius: 0 0 var(--radius) var(--radius);
+      margin-top: 0;
+    }
+
+    .copy-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      font-size: 11px;
+      padding: 3px 9px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: color .15s, border-color .15s;
+      font-family: var(--font);
+    }
+
+    .copy-btn:hover { color: var(--text); border-color: var(--text-muted); }
+    .copy-btn.copied { color: var(--green); border-color: var(--green); }
+
+    /* Syntax highlights */
+    .kw { color: #b48ead; }
+    .str { color: #a3be8c; }
+    .cm { color: var(--text-dim); font-style: italic; }
+    .flag { color: #88c0d0; }
+    .url { color: #8fbcbb; }
+    .punct { color: #81a1c1; }
+    .key { color: #88c0d0; }
+    .val { color: #a3be8c; }
+
+    /* ── Steps ── */
+    .steps { margin: 24px 0; }
+
+    .step {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 0;
+      position: relative;
+    }
+
+    .step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 15px;
+      top: 34px;
+      bottom: -8px;
+      width: 2px;
+      background: var(--border);
+    }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: var(--accent-dim);
+      border: 2px solid var(--accent);
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .step-content {
+      flex: 1;
+      padding-bottom: 28px;
+    }
+
+    .step-title {
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    /* ── Table ── */
+    .table-wrap { overflow-x: auto; margin: 16px 0; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead th {
+      text-align: left;
+      padding: 10px 14px;
+      background: var(--surface);
+      color: var(--text-muted);
+      font-weight: 500;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      border: 1px solid var(--border);
+    }
+
+    tbody td {
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      vertical-align: top;
+      line-height: 1.5;
+    }
+
+    tbody tr:hover { background: var(--surface); }
+
+    .status { font-family: var(--font-mono); font-size: 13px; white-space: nowrap; }
+    .status.ok { color: var(--green); }
+    .status.warn { color: var(--yellow); }
+    .status.err { color: var(--red); }
+    .status.pending { color: var(--blue); }
+
+    /* ── Accordion ── */
+    .accordion { margin: 8px 0; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+
+    .accordion-header {
+      padding: 14px 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      background: var(--surface);
+      transition: color .15s, background .15s;
+      user-select: none;
+    }
+
+    .accordion-header:hover { color: var(--text); background: var(--surface-2); }
+
+    .accordion-arrow {
+      font-size: 11px;
+      transition: transform .2s;
+      color: var(--text-dim);
+    }
+
+    .accordion.open .accordion-arrow { transform: rotate(180deg); }
+    .accordion.open .accordion-header { color: var(--text); }
+
+    .accordion-body {
+      display: none;
+      padding: 18px;
+      font-size: 14px;
+      line-height: 1.7;
+      border-top: 1px solid var(--border);
+    }
+
+    .accordion.open .accordion-body { display: block; }
+
+    .accordion-body p { font-size: 14px; }
+
+    /* ── Scope cards ── */
+    .scope-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .scope-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      transition: border-color .15s;
+    }
+
+    .scope-card:hover { border-color: var(--accent); }
+
+    .scope-card-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      font-family: var(--font-mono);
+      margin-bottom: 6px;
+    }
+
+    .scope-card-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .scope-card-file {
+      font-size: 12px;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── Next steps ── */
+    .next-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .next-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      text-decoration: none;
+      transition: border-color .15s, background .15s;
+      display: block;
+    }
+
+    .next-card:hover {
+      border-color: var(--accent);
+      background: var(--surface-2);
+      text-decoration: none;
+    }
+
+    .next-card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .next-card-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* ── Divider ── */
+    .divider { height: 1px; background: var(--border); margin: 32px 0; }
+
+    /* ── On this page ── */
+    .toc {
+      position: fixed;
+      right: 0;
+      top: var(--header-h);
+      width: 200px;
+      padding: 24px 20px;
+      font-size: 13px;
+    }
+
+    .toc-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--text-dim);
+      margin-bottom: 10px;
+    }
+
+    .toc-link {
+      display: block;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 4px 0;
+      border-left: 2px solid var(--border);
+      padding-left: 10px;
+      font-size: 12.5px;
+      transition: color .15s, border-color .15s;
+      line-height: 1.4;
+    }
+
+    .toc-link:hover { color: var(--text); border-left-color: var(--accent); }
+
+    .toc-link.sub {
+      padding-left: 20px;
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 1100px) { .toc { display: none; } }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: 32px 20px; }
+      .scope-grid { grid-template-columns: 1fr; }
+      .next-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header>
+  <a href="#" class="logo">
+    <div class="logo-icon">✦</div>
+    Claude Code
+  </a>
+  <div class="header-divider"></div>
+  <span class="header-title">Docs</span>
+  <div class="header-badge">MCP Quickstart</div>
+</header>
+
+<!-- ── Layout ── -->
+<div class="layout">
+
+  <!-- ── Sidebar ── -->
+  <nav class="sidebar">
+    <div class="nav-section">
+      <div class="nav-section-title">시작하기</div>
+      <a class="nav-link" href="#"><span class="icon">⚡</span>빠른 시작</a>
+      <a class="nav-link" href="#"><span class="icon">📦</span>설치</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">MCP 서버</div>
+      <a class="nav-link active" href="#"><span class="icon">🔌</span>MCP 빠른 시작</a>
+      <a class="nav-link" href="#"><span class="icon">📋</span>MCP 레퍼런스</a>
+      <a class="nav-link" href="#"><span class="icon">🔧</span>서버 구성</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">플랫폼</div>
+      <a class="nav-link" href="#"><span class="icon">🖥</span>데스크톱 앱</a>
+      <a class="nav-link" href="#"><span class="icon">💻</span>VS Code</a>
+      <a class="nav-link" href="#"><span class="icon">🌐</span>웹</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">레퍼런스</div>
+      <a class="nav-link" href="#"><span class="icon">⚙️</span>환경 변수</a>
+      <a class="nav-link" href="#"><span class="icon">🔑</span>인증</a>
+      <a class="nav-link" href="#"><span class="icon">🏢</span>관리형 MCP</a>
+    </div>
+  </nav>
+
+  <!-- ── Main ── -->
+  <main class="main">
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+      <a href="#">Claude Code</a>
+      <span>›</span>
+      <a href="#">MCP</a>
+      <span>›</span>
+      <span style="color:var(--text-muted)">MCP 서버 연결하기</span>
+    </div>
+
+    <!-- Title -->
+    <h1>MCP 서버 연결하기</h1>
+    <p class="subtitle">MCP 서버를 Claude Code에 추가하고, 연결을 확인하고, 디스크에서 설정 파일 위치를 찾는 방법을 알아보세요.</p>
+
+    <p>
+      <a href="https://modelcontextprotocol.io/introduction">Model Context Protocol (MCP)</a>을 사용하면 Claude Code가 이슈 트래커 검색, 데이터베이스 쿼리, 웹 브라우저 제어 등 기본 내장 도구 이상의 기능을 사용할 수 있습니다. 이러한 도구는 사용자의 머신 또는 호스팅 서비스로 실행되는 MCP 서버에서 제공됩니다.
+    </p>
+
+    <p>
+      이 가이드에서는 Claude Code CLI를 사용하여 하나의 MCP 서버를 처음부터 끝까지 연결하는 방법을 안내합니다. 완료 후에는 서버가 연결·응답 중인 상태가 되고, 설정 파일 위치와 가장 일반적인 연결 오류 해결 방법을 알 수 있습니다.
+    </p>
+
+    <div class="callout note">
+      <span class="callout-icon">💡</span>
+      <span>데스크톱 앱, VS Code, 웹 등 다른 환경에서도 MCP 서버를 추가할 수 있습니다. <a href="#">다른 환경에서 연결하기</a> 섹션을 참고하세요.</span>
+    </div>
+
+    <!-- ── Before you begin ── -->
+    <h2 id="before">시작하기 전에</h2>
+    <p>다음 사항이 준비되어 있는지 확인하세요:</p>
+    <ul style="margin: 0 0 16px 20px; line-height: 2;">
+      <li><a href="#">Claude Code 설치</a> 및 인증 완료</li>
+      <li>프로젝트 디렉터리에서 터미널 열기 (빈 디렉터리도 가능)</li>
+    </ul>
+
+    <!-- ── Add and verify ── -->
+    <h2 id="add">서버 추가 및 확인</h2>
+    <p>
+      아래 예시는 <a href="#">Claude Code 문서 MCP 서버</a>에 연결합니다. 이 서버는 Claude Code 문서의 전체 텍스트 검색 기능을 제공하는 호스팅 서버로, 인증이나 별도 설정이 필요 없어 첫 번째 테스트 서버로 적합합니다.
+    </p>
+    <p>
+      단계는 모든 서버에서 동일합니다: 추가 → 연결 상태 확인 → 세션에서 사용, 그리고 선택적으로 정리 단계를 거칩니다.
+    </p>
+
+    <div class="steps">
+      <!-- Step 1 -->
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">MCP 서버 추가</div>
+          <p>서버를 Claude Code에 등록합니다. <code>claude</code> 세션 안이 아닌 터미널에서 실행하세요.</p>
+          <div class="code-header">
+            <span>bash</span>
+            <button class="copy-btn" onclick="copyCode(this)">복사</button>
+          </div>
+          <pre><code><span class="kw">claude</span> mcp add <span class="flag">--transport</span> http claude-code-docs <span class="url">https://code.claude.com/docs/mcp</span></code></pre>
+          <p>명령어 구성:</p>
+          <ul style="margin: 0 0 16px 24px; line-height: 1.9; font-size: 14px; color: var(--text-muted);">
+            <li><code>claude mcp add</code> — 서버를 Claude Code에 등록</li>
+            <li><code>--transport http</code> — 로컬 프로세스가 아닌 URL의 호스팅 서버</li>
+            <li><code>claude-code-docs</code> — 직접 지정하는 이름 (다른 이름도 동일하게 동작)</li>
+            <li><code>https://code.claude.com/docs/mcp</code> — 서버가 호스팅된 URL</li>
+          </ul>
+          <p>명령 실행 시 <code>Added HTTP MCP server claude-code-docs</code>와 같은 확인 메시지가 출력됩니다.</p>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">연결 상태 확인</div>
+          <p>서버 목록에서 상태를 확인합니다:</p>
+          <div class="code-header">
+            <span>bash</span>
+            <button class="copy-btn" onclick="copyCode(this)">복사</button>
+          </div>
+          <pre><code><span class="kw">claude</span> mcp list</code></pre>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>상태</th>
+                  <th>의미</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="status ok">✓ Connected</span></td>
+                  <td>사용 준비 완료. <code>claude-code-docs</code>에서 표시되어야 합니다.</td>
+                </tr>
+                <tr>
+                  <td><span class="status warn">! Needs authentication</span></td>
+                  <td>서버에 접근 가능하지만 브라우저 로그인 또는 토큰이 필요합니다.</td>
+                </tr>
+                <tr>
+                  <td><span class="status err">✗ Failed to connect</span></td>
+                  <td>서버가 응답하지 않습니다. 문제 해결 섹션을 참고하세요.</td>
+                </tr>
+                <tr>
+                  <td><span class="status err">✗ Connection error</span></td>
+                  <td>연결 시도 중 오류 발생. 문제 해결 섹션을 참고하세요.</td>
+                </tr>
+                <tr>
+                  <td><span class="status pending">⏸ Pending approval</span></td>
+                  <td>아직 승인하지 않은 프로젝트 범위 서버.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">서버 사용</div>
+          <p>세션을 시작하고 Claude에게 새 서버를 사용하도록 요청합니다:</p>
+          <div class="code-header">
+            <span>bash</span>
+            <button class="copy-btn" onclick="copyCode(this)">복사</button>
+          </div>
+          <pre><code><span class="kw">claude</span></code></pre>
+          <div class="code-header">
+            <span>프롬프트 예시</span>
+            <button class="copy-btn" onclick="copyCode(this)">복사</button>
+          </div>
+          <pre><code>Use the claude-code-docs server to look up what MCP_TIMEOUT does</code></pre>
+          <div class="callout info">
+            <span class="callout-icon">ℹ️</span>
+            <span>평소에는 프롬프트에 서버 이름을 명시할 필요가 없습니다. Claude가 자동으로 관련 도구를 선택합니다. 여기서는 데모를 위해 명시적으로 지정합니다.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">서버 제거 (선택 사항)</div>
+          <p>실험이 끝나면 서버를 제거할 수 있습니다:</p>
+          <div class="code-header">
+            <span>bash</span>
+            <button class="copy-btn" onclick="copyCode(this)">복사</button>
+          </div>
+          <pre><code><span class="kw">claude</span> mcp remove claude-code-docs</code></pre>
+          <div class="callout note">
+            <span class="callout-icon">💡</span>
+            <span>연결된 각 서버의 도구 이름과 서버 지침이 모든 세션의 컨텍스트 창에 로드됩니다. 사용하지 않는 서버를 제거하면 컨텍스트 공간을 절약할 수 있습니다.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Where servers are saved ── -->
+    <h2 id="scopes">서버 저장 위치</h2>
+    <p>
+      <code>claude mcp add</code> 명령은 서버 세부 정보를 설정 파일에 저장합니다. 기본적으로 <code>local</code> 범위로 등록됩니다: 현재 프로젝트에서만 활성화되는 나만의 설정입니다.
+    </p>
+
+    <div class="scope-grid">
+      <div class="scope-card">
+        <div class="scope-card-title">local</div>
+        <div class="scope-card-desc">나만의 설정, 현재 프로젝트에서만 활성화. 기본값.</div>
+        <div class="scope-card-file">~/.claude.json</div>
+      </div>
+      <div class="scope-card">
+        <div class="scope-card-title">project</div>
+        <div class="scope-card-desc">프로젝트를 클론한 모든 팀원과 공유.</div>
+        <div class="scope-card-file">.mcp.json (프로젝트 루트)</div>
+      </div>
+      <div class="scope-card">
+        <div class="scope-card-title">user</div>
+        <div class="scope-card-desc">나만의 설정, 모든 프로젝트에서 활성화.</div>
+        <div class="scope-card-file">~/.claude.json (mcpServers 키)</div>
+      </div>
+    </div>
+
+    <p>서버의 범위를 확인하려면:</p>
+    <div class="code-header">
+      <span>bash</span>
+      <button class="copy-btn" onclick="copyCode(this)">복사</button>
+    </div>
+    <pre><code><span class="kw">claude</span> mcp get claude-code-docs</code></pre>
+
+    <!-- ── Change server scope ── -->
+    <h2 id="change-scope">서버 범위 변경</h2>
+    <p>서버를 추가할 때 범위가 고정됩니다. 범위를 변경하려면 기존 항목을 제거하고 새 범위로 다시 추가해야 합니다.</p>
+
+    <h3>모든 프로젝트에서 서버 사용</h3>
+    <p><code>user</code> 범위로 추가하면 여는 모든 프로젝트에서 활성화됩니다 (나만 사용):</p>
+    <div class="code-header">
+      <span>bash</span>
+      <button class="copy-btn" onclick="copyCode(this)">복사</button>
+    </div>
+    <pre><code><span class="kw">claude</span> mcp add <span class="flag">--scope</span> user <span class="flag">--transport</span> http claude-code-docs <span class="url">https://code.claude.com/docs/mcp</span></code></pre>
+
+    <h3>팀과 서버 공유</h3>
+    <p><code>project</code> 범위로 추가하면 프로젝트 루트의 <code>.mcp.json</code>에 저장됩니다:</p>
+    <div class="code-header">
+      <span>bash</span>
+      <button class="copy-btn" onclick="copyCode(this)">복사</button>
+    </div>
+    <pre><code><span class="kw">claude</span> mcp add <span class="flag">--scope</span> project <span class="flag">--transport</span> http claude-code-docs <span class="url">https://code.claude.com/docs/mcp</span></code></pre>
+    <p><code>.mcp.json</code>을 버전 관리에 커밋하면 팀원들도 서버를 사용할 수 있습니다.</p>
+
+    <!-- ── Additional examples ── -->
+    <h2 id="examples">추가 MCP 서버 예시</h2>
+
+    <h3>로컬 서버 추가 (Playwright)</h3>
+    <p>
+      로컬 stdio 서버는 Claude Code가 서브프로세스로 실행하는 프로그램입니다. <a href="https://github.com/microsoft/playwright-mcp">Playwright MCP 서버</a>는 Claude에게 브라우저를 제공하며, Node.js 18 이상이 필요합니다.
+    </p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Playwright 서버 등록</div>
+          <div class="code-header">
+            <span>bash</span>
+            <button class="copy-btn" onclick="copyCode(this)">복사</button>
+          </div>
+          <pre><code><span class="kw">claude</span> mcp add playwright <span class="punct">--</span> npx <span class="flag">-y</span> @playwright/mcp@latest</code></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">연결 확인</div>
+          <div class="code-header">
+            <span>bash</span>
+            <button class="copy-btn" onclick="copyCode(this)">복사</button>
+          </div>
+          <pre><code><span class="kw">claude</span> mcp list</code></pre>
+          <p style="font-size:14px; color:var(--text-muted);">첫 번째 확인 시 <code>npx</code>가 패키지를 다운로드하는 동안 <code>✗ Failed to connect</code>가 표시될 수 있습니다. 잠시 기다린 후 다시 실행하세요.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">브라우저 사용</div>
+          <div class="code-header">
+            <span>프롬프트 예시</span>
+            <button class="copy-btn" onclick="copyCode(this)">복사</button>
+          </div>
+          <pre><code>Use playwright to open https://example.com and tell me the page title</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <h3>로그인이 필요한 서버 연결 (Sentry)</h3>
+    <p>Sentry, Linear, Notion 같은 호스팅 서비스는 OAuth를 사용합니다. 서버 URL을 추가한 후 브라우저에서 로그인합니다.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">서버 추가</div>
+          <div class="code-header">
+            <span>bash</span>
+            <button class="copy-btn" onclick="copyCode(this)">복사</button>
+          </div>
+          <pre><code><span class="kw">claude</span> mcp add <span class="flag">--transport</span> http sentry <span class="url">https://mcp.sentry.dev/mcp</span></code></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">브라우저에서 인증</div>
+          <p>Claude Code 세션을 시작하고 MCP 패널을 엽니다:</p>
+          <div class="code-header">
+            <span>명령어</span>
+            <button class="copy-btn" onclick="copyCode(this)">복사</button>
+          </div>
+          <pre><code>/mcp</code></pre>
+          <p style="font-size:14px; color:var(--text-muted);">목록에서 <code>sentry</code>를 선택하고 Enter를 누른 후 <strong>Authenticate</strong>를 선택하세요. 브라우저에서 Sentry 로그인 페이지가 열립니다.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">서버 사용</div>
+          <pre><code>What Sentry projects do I have access to?</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Edit .mcp.json directly ── -->
+    <h2 id="mcp-json">.mcp.json 직접 편집</h2>
+    <p>프로젝트 루트에 <code>.mcp.json</code>을 직접 만들어 서버를 설정할 수도 있습니다. 이 파일은 리포지터리에 커밋되어 팀 설정으로 활용됩니다.</p>
+
+    <div class="code-header">
+      <span>.mcp.json</span>
+      <button class="copy-btn" onclick="copyCode(this)">복사</button>
+    </div>
+    <pre><code><span class="punct">{</span>
+  <span class="key">"mcpServers"</span><span class="punct">:</span> <span class="punct">{</span>
+    <span class="key">"claude-code-docs"</span><span class="punct">:</span> <span class="punct">{</span>
+      <span class="key">"type"</span><span class="punct">:</span> <span class="val">"http"</span><span class="punct">,</span>
+      <span class="key">"url"</span><span class="punct">:</span> <span class="val">"https://code.claude.com/docs/mcp"</span>
+    <span class="punct">},</span>
+    <span class="key">"playwright"</span><span class="punct">:</span> <span class="punct">{</span>
+      <span class="key">"type"</span><span class="punct">:</span> <span class="val">"stdio"</span><span class="punct">,</span>
+      <span class="key">"command"</span><span class="punct">:</span> <span class="val">"npx"</span><span class="punct">,</span>
+      <span class="key">"args"</span><span class="punct">:</span> <span class="punct">[</span><span class="val">"-y"</span><span class="punct">,</span> <span class="val">"@playwright/mcp@latest"</span><span class="punct">]</span>
+    <span class="punct">}</span>
+  <span class="punct">}</span>
+<span class="punct">}</span></code></pre>
+
+    <p>파일 저장 후 새 Claude Code 세션을 시작하면 자동으로 읽어옵니다. 처음에는 서버 승인 프롬프트가 나타납니다.</p>
+
+    <!-- ── Connect from other surfaces ── -->
+    <h2 id="other-surfaces">다른 환경에서 연결</h2>
+    <p>이 가이드에서는 <code>claude mcp</code> CLI 명령을 사용했지만 모든 Claude Code 환경에서 MCP 서버에 연결할 수 있습니다:</p>
+    <ul style="margin: 0 0 16px 24px; line-height: 2; font-size: 15px; color: var(--text-muted);">
+      <li><strong style="color:var(--text)">Claude Code 데스크톱 앱</strong>: Connectors UI를 통해 서버 추가</li>
+      <li><strong style="color:var(--text)">Claude Desktop 채팅 앱</strong>: <code>claude mcp add-from-claude-desktop</code> 명령으로 가져오기</li>
+      <li><strong style="color:var(--text)">VS Code</strong>: 외부 도구와 MCP 연결 문서 참고</li>
+      <li><strong style="color:var(--text)">웹의 Claude Code</strong>: 리포지터리의 <code>.mcp.json</code> 읽기</li>
+      <li><strong style="color:var(--text)">Claude.ai</strong>: 계정에 추가한 커넥터가 CLI에서 자동으로 로드됨</li>
+    </ul>
+
+    <!-- ── Troubleshooting ── -->
+    <h2 id="troubleshooting">문제 해결</h2>
+    <p>서버가 연결되지 않으면 세션 내 <code>/mcp</code> 또는 셸에서 <code>claude mcp list</code>로 상태를 확인하세요.</p>
+
+    <div class="accordion" onclick="toggleAccordion(this)">
+      <div class="accordion-header">
+        <span>/mcp에 "No MCP servers configured" 표시</span>
+        <span class="accordion-arrow">▼</span>
+      </div>
+      <div class="accordion-body">
+        <p>Claude Code가 현재 디렉터리에서 서버를 찾지 못했습니다. 가장 일반적인 원인:</p>
+        <ul style="margin: 10px 0 0 20px; line-height: 1.9; font-size: 14px; color: var(--text-muted);">
+          <li>다른 프로젝트에서 <code>claude mcp add</code>를 실행했습니다. 현재 프로젝트에서 다시 추가하거나 <code>--scope user</code>로 추가하세요.</li>
+          <li>잘못된 경로의 설정 파일을 편집했습니다. 올바른 파일은 <code>~/.claude.json</code>과 <code>&lt;project&gt;/.mcp.json</code>입니다.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="accordion" onclick="toggleAccordion(this)">
+      <div class="accordion-header">
+        <span>상태가 "Failed to connect" 또는 "Connection error"</span>
+        <span class="accordion-arrow">▼</span>
+      </div>
+      <div class="accordion-body">
+        <p>HTTP 서버의 경우 URL이 접근 가능한지 확인하세요:</p>
+        <div class="code-header">
+          <span>bash</span>
+          <button class="copy-btn" onclick="copyCode(this); event.stopPropagation()">복사</button>
+        </div>
+        <pre onclick="event.stopPropagation()"><code>curl -I https://mcp.sentry.dev/mcp</code></pre>
+        <p style="margin-top:12px;">stdio 서버의 경우 터미널에서 직접 명령을 실행해 오류를 확인하세요:</p>
+        <div class="code-header">
+          <span>bash</span>
+          <button class="copy-btn" onclick="copyCode(this); event.stopPropagation()">복사</button>
+        </div>
+        <pre onclick="event.stopPropagation()"><code>npx -y @playwright/mcp@latest</code></pre>
+      </div>
+    </div>
+
+    <div class="accordion" onclick="toggleAccordion(this)">
+      <div class="accordion-header">
+        <span>시작 시 연결 시간 초과</span>
+        <span class="accordion-arrow">▼</span>
+      </div>
+      <div class="accordion-body">
+        <p>서버가 기본 30초 시작 시간 초과를 초과했습니다. <code>MCP_TIMEOUT</code> 환경 변수로 제한을 늘리세요 (밀리초 단위):</p>
+        <div class="code-header">
+          <span>bash</span>
+          <button class="copy-btn" onclick="copyCode(this); event.stopPropagation()">복사</button>
+        </div>
+        <pre onclick="event.stopPropagation()"><code>MCP_TIMEOUT=60000 claude</code></pre>
+      </div>
+    </div>
+
+    <div class="accordion" onclick="toggleAccordion(this)">
+      <div class="accordion-header">
+        <span>서버가 연결되었지만 도구가 표시되지 않음</span>
+        <span class="accordion-arrow">▼</span>
+      </div>
+      <div class="accordion-body">
+        <p>세션 내 <code>/mcp</code>를 실행하고 서버를 선택해 도구 목록을 확인하세요. 목록이 비어 있다면 API 키와 같은 필수 환경 변수가 누락된 것입니다. <code>--env KEY=value</code> 옵션으로 변수를 전달하세요.</p>
+      </div>
+    </div>
+
+    <div class="accordion" onclick="toggleAccordion(this)">
+      <div class="accordion-header">
+        <span>.mcp.json 변경 사항이 적용되지 않음</span>
+        <span class="accordion-arrow">▼</span>
+      </div>
+      <div class="accordion-body">
+        <p>Claude Code는 세션 시작 시 <code>.mcp.json</code>을 읽습니다. 파일 편집 후 세션을 종료하고 다시 시작하세요. 이전에 서버를 거부한 경우 프로젝트 승인을 초기화하세요:</p>
+        <div class="code-header">
+          <span>bash</span>
+          <button class="copy-btn" onclick="copyCode(this); event.stopPropagation()">복사</button>
+        </div>
+        <pre onclick="event.stopPropagation()"><code><span class="kw">claude</span> mcp reset-project-choices</code></pre>
+      </div>
+    </div>
+
+    <div class="accordion" onclick="toggleAccordion(this)">
+      <div class="accordion-header">
+        <span>OAuth 로그인 실패 또는 브라우저가 열리지 않음</span>
+        <span class="accordion-arrow">▼</span>
+      </div>
+      <div class="accordion-body">
+        <p><code>/mcp</code>를 실행하고 서버를 선택한 후 <strong>Authenticate</strong>를 다시 선택하세요. 브라우저가 자동으로 열리지 않으면 터미널에 표시된 URL을 복사해 수동으로 열어보세요.</p>
+      </div>
+    </div>
+
+    <!-- ── Next steps ── -->
+    <h2 id="next">다음 단계</h2>
+    <p>서버가 연결되었으니 MCP의 나머지 기능을 탐색해 보세요:</p>
+
+    <div class="next-grid">
+      <a href="#" class="next-card">
+        <div class="next-card-title">🔍 더 많은 MCP 서버 찾기</div>
+        <div class="next-card-desc">Anthropic Directory에서 다양한 서버 탐색</div>
+      </a>
+      <a href="#" class="next-card">
+        <div class="next-card-title">👥 팀과 서버 공유</div>
+        <div class="next-card-desc">설치 범위를 사용해 팀원과 서버 공유</div>
+      </a>
+      <a href="#" class="next-card">
+        <div class="next-card-title">🏢 조직의 MCP 액세스 관리</div>
+        <div class="next-card-desc">관리형 설정 및 정책 제어</div>
+      </a>
+      <a href="#" class="next-card">
+        <div class="next-card-title">🔨 나만의 서버 만들기</div>
+        <div class="next-card-desc">MCP SDK로 커스텀 서버 개발</div>
+      </a>
+      <a href="#" class="next-card">
+        <div class="next-card-title">📌 MCP 리소스 참조</div>
+        <div class="next-card-desc">@ 멘션으로 프롬프트에서 리소스 참조</div>
+      </a>
+      <a href="#" class="next-card">
+        <div class="next-card-title">⚡ MCP 프롬프트를 명령으로 실행</div>
+        <div class="next-card-desc">/ 메뉴에서 MCP 프롬프트 실행</div>
+      </a>
+    </div>
+
+    <div class="divider"></div>
+    <p style="font-size:13px; color:var(--text-dim); text-align:center;">
+      원문: <a href="https://code.claude.com/docs/en/mcp-quickstart" style="color:var(--text-dim);">code.claude.com/docs/en/mcp-quickstart</a>
+    </p>
+  </main>
+
+  <!-- ── TOC ── -->
+  <aside class="toc">
+    <div class="toc-title">이 페이지에서</div>
+    <a class="toc-link" href="#before">시작하기 전에</a>
+    <a class="toc-link" href="#add">서버 추가 및 확인</a>
+    <a class="toc-link" href="#scopes">서버 저장 위치</a>
+    <a class="toc-link" href="#change-scope">서버 범위 변경</a>
+    <a class="toc-link sub" href="#change-scope">모든 프로젝트</a>
+    <a class="toc-link sub" href="#change-scope">팀과 공유</a>
+    <a class="toc-link" href="#examples">추가 예시</a>
+    <a class="toc-link sub" href="#examples">로컬 서버</a>
+    <a class="toc-link sub" href="#examples">로그인 필요</a>
+    <a class="toc-link" href="#mcp-json">.mcp.json 편집</a>
+    <a class="toc-link" href="#other-surfaces">다른 환경</a>
+    <a class="toc-link" href="#troubleshooting">문제 해결</a>
+    <a class="toc-link" href="#next">다음 단계</a>
+  </aside>
+
+</div>
+
+<script>
+  function toggleAccordion(el) {
+    el.classList.toggle('open');
+  }
+
+  function copyCode(btn) {
+    const pre = btn.closest('.code-header').nextElementSibling;
+    navigator.clipboard.writeText(pre.innerText).then(() => {
+      btn.textContent = '완료!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = '복사';
+        btn.classList.remove('copied');
+      }, 1800);
+    });
+  }
+
+  // Highlight active TOC link on scroll
+  const sections = document.querySelectorAll('h2[id]');
+  const tocLinks = document.querySelectorAll('.toc-link');
+
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 80) current = s.id;
+    });
+    tocLinks.forEach(l => {
+      l.classList.remove('active');
+      if (l.getAttribute('href') === '#' + current) l.classList.add('active');
+    });
+  });
+
+  // Highlight active sidebar link
+  document.querySelectorAll('.nav-link').forEach(l => {
+    l.addEventListener('click', function() {
+      document.querySelectorAll('.nav-link').forEach(x => x.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
